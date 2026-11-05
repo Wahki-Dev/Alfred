@@ -1,0 +1,1 @@
+# Identifiants de règles retirés du kit : un par ligne, jamais réutilisés (vérifié par tests/check-kit.sh).

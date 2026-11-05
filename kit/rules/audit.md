@@ -1,283 +1,154 @@
-# Audit — Base universelle de règles (SOURCE)
+# Audit — Règles universelles et procédure
 
-> ⚠️ **SOURCE de compilation — ce fichier n'est PAS lu pendant un audit.**
-> Il sert de base universelle pour compiler `agent-project/check.md`
-> (voir `agent/blueprints/check.blueprint.md`).
-> Pendant un audit, l'agent lit uniquement `agent-project/check.md` (+ `agent-project/memory.md`).
-> Les règles ci-dessous sont **indépendantes du langage** ; le détail par techno est dans `agent/stacks/`.
-
----
-
-## Restrictions de l'audit
-
-- JAMAIS modifier du code sans validation explicite
-- JAMAIS exécuter des outils d'analyse (linter, tests) sans demande
-- JAMAIS proposer des corrections qui violent `agent-project/memory.md`
-- TOUJOURS proposer avant d'appliquer
-- TOUJOURS expliquer le pourquoi
-- TOUJOURS prioriser : CRITIQUE > MOYEN > MINEUR
+> Lu directement à l'audit, avec `agent/rules/tests.md`, la stack du projet (`agent/stacks/<langage>/`),
+> la direction citée par `agent-project/architecture.md` (`agent/technical-directions/custom.md`, plus
+> `agent/technical-directions/ddd-lite.md` si elle s'applique) et `agent-project/rules.md`.
+> Format d'une règle : `identifiant · sévérité [· socle] — règle`. Sévérités : CRITIQUE (bloque la fin de
+> feature), MOYEN (à corriger ou planifier), MINEUR.
 
 ---
 
-## Checklist d'audit
+## Surcharge par l'équipe
 
-### 0) Préparation (OBLIGATOIRE)
-- [ ] Lire `agent-project/memory.md` avant tout audit
-- [ ] Lire `agent-project/check.md` avant tout audit
-- [ ] Lire le plan validé de la feature (`agent-project/plans/<plan>.md`) s'il existe
-- [ ] Identifier les conventions de nommage du projet
-- [ ] Identifier les patterns d'architecture du projet
+`agent-project/rules.md` peut, pour une règle du kit identifiée :
+- la **désactiver** (raison + date obligatoires) ;
+- changer sa **sévérité** ;
+- restreindre sa **portée** (ex : nouveaux fichiers et fichiers modifiés seulement) ;
+- et **ajouter** des règles `PRJ-NN`.
 
----
+Priorité : `rules.md` > direction > stack > ce fichier. Les règles `socle` ne peuvent être ni désactivées
+ni rétrogradées : une exception ponctuelle est une « limite assumée » datée dans `agent-project/security.md`.
 
-### 0bis) Conformité au plan validé (CRITIQUE)
+Une règle de stack ou de direction qui précise une règle de ce fichier la remplace : une violation n'est
+signalée qu'une fois, sous l'identifiant le plus précis.
 
-- [ ] **Couverture complète** : chaque exigence / changement prévu au plan est implémenté (rien d'oublié)
-- [ ] **Pas d'écart non justifié** : le code ne dévie pas du plan validé sans raison explicite
-- [ ] **Pas de hors-périmètre** : aucun ajout non prévu et non validé
-
----
-
-### 1) Architecture & Responsabilité
-
-- [ ] **Single responsibility** : chaque fichier/classe a une seule responsabilité
-- [ ] **Pas de logique métier dans les contrôleurs/handlers** → déléguer aux services
-- [ ] **Nommage** : conforme aux conventions définies dans `agent-project/memory.md`
-- [ ] **Structure dossiers** : respect de l'architecture définie dans `memory.md`
-- [ ] **Patterns projet** : respect des patterns spécifiques définis dans `memory.md`
+En cas de conflit entre une règle de ce fichier et `agent/rules/ponytail.md`, ponytail l'emporte :
+on n'ajoute pas de couche, de cache ou d'abstraction sans besoin réel et présent.
 
 ---
 
-### 2) Typage & Qualité
+## Procédure
 
-- [ ] **Typage** : aussi strict que le langage le permet (paramètres, retours, propriétés)
-- [ ] **Pas de type fourre-tout** (non spécifique) sans justification — mots-clés exacts dans la règle de stack
-- [ ] **Conventions du langage** : respect du standard défini dans `memory.md` / la règle de stack
-- [ ] **Imports** : pas d'imports inutilisés
+1. **Cible** : diff de la feature, dossier ou module demandé. Lire le plan s'il existe.
+2. **Règles** : ce fichier + `agent/rules/tests.md` + stack + direction(s) + `agent-project/rules.md`
+   (appliquer désactivations, sévérités, portées et ajouts).
+3. **Outils** : lancer les commandes de vérification déclarées dans `agent-project/memory.md` (tests, lint,
+   analyse statique, audit des dépendances). Aucune autre commande sans permission.
+4. **Rapport** (format ci-dessous). Aucune modification de code sans validation ; les corrections proposées
+   respectent `memory.md` et `rules.md`.
 
----
+Une règle qu'on ne peut pas vérifier (outil absent, code hors cible) est rapportée « non vérifiée »,
+jamais « conforme ».
 
-### 3) Duplication (CRITIQUE)
-
-- [ ] **Pas de code dupliqué** → extraire en services/actions/helpers
-- [ ] **Pas de templates/vues répétés** → créer des composants
-- [ ] **Pas de requêtes similaires** → créer des scopes/repositories
-- [ ] **Pas de validations répétées** → créer des validators/rules réutilisables
-- [ ] **Pas de valeurs en dur répétées** → utiliser des constantes/enums/config
-
----
-
-### 4) Valeurs & Internationalisation
-
-- [ ] **Pas de valeurs en dur** pour les concepts métier → enums/constantes
-- [ ] **i18n (si le projet en dispose)** : textes affichés passés par le mécanisme d'i18n — jamais de texte en dur dans les vues (fonctions exactes dans la règle de stack)
-- [ ] **Messages d'erreur** : clairs, traduits si i18n, sinon configurables
-
----
-
-### 5) Validation & Formulaires
-
-- [ ] **Validation** côté serveur pour toute donnée utilisateur
-- [ ] **Validators dédiés** si règles complexes ou réutilisées (pas de validation inline répétée)
-- [ ] **Messages d'erreur** : clairs, traduits
-- [ ] **Sanitization** des données si nécessaire
-
----
-
-### 6) Routes & Organisation
-
-- [ ] Routes groupées par contexte
-- [ ] Nommage des routes explicite et cohérent
-- [ ] Middleware appliqués aux groupes (pas route par route)
-- [ ] Routes sensibles protégées (authentification + autorisation)
-
----
-
-### 7) Performance
-
-- [ ] **Pas de requêtes dans les boucles** (N+1)
-- [ ] **Eager loading** pour les relations chargées
-- [ ] **Pagination** pour les grandes listes
-- [ ] **Cache** pour les données statiques/coûteuses
-- [ ] Index sur colonnes fréquemment recherchées
-
----
-
-### 8) Sécurité
-
-> Checklist de base appliquée à **tout** projet (y compris vierge). Les mécanismes exacts
-> (fonctions, middlewares, en-têtes) sont précisés par la règle de stack.
-
-#### 8.1 Authentification & session
-- [ ] **Authentification** requise sur les endpoints non publics (pas d'accès anonyme par défaut)
-- [ ] **Mots de passe** hachés avec un algorithme fort (bcrypt/argon2), jamais en clair ni chiffrement réversible
-- [ ] **Sessions** : régénération de l'ID au login (anti-fixation), expiration/timeout, invalidation au logout
-- [ ] **Reset password** : token à usage unique, expirant, non devinable
-- [ ] **Aucun identifiant par défaut** ni **compte de test/admin** actif en dehors du dev
-
-#### 8.2 Autorisation
-- [ ] **Autorisation** vérifiée côté serveur (policies, gates, guards) pour chaque action sensible
-- [ ] **Ownership / IDOR** : un utilisateur ne peut accéder/modifier que ses propres ressources
-- [ ] **Pas de contrôle d'accès uniquement côté client** (UI cachée ≠ endpoint protégé)
-
-#### 8.3 Injections & sorties
-- [ ] **Pas de SQL/NoSQL brut** sans paramètres bindés (requêtes préparées / query builder)
-- [ ] **Pas d'injection de commandes** (pas de concaténation d'input dans un appel shell/OS)
-- [ ] **XSS** : échappement systématique des outputs (contexte HTML/attribut/JS/URL)
-- [ ] **Validation & sanitization** de toute donnée utilisateur côté serveur
-
-#### 8.4 En-têtes & requêtes cross-origin
-- [ ] **CSRF** : protection active sur toutes les mutations (POST/PUT/PATCH/DELETE)
-- [ ] **CORS** : origines explicitement autorisées (pas de `*` avec credentials)
-- [ ] **CSP** : Content-Security-Policy restrictive (limite les sources scripts/styles)
-- [ ] **HSTS** : Strict-Transport-Security activé (+ en-têtes `X-Content-Type-Options`, `X-Frame-Options`/`frame-ancestors`)
-
-#### 8.5 Secrets & configuration
-- [ ] **Aucun secret ni clé API** en dur dans le code ou le dépôt → variables d'environnement / vault
-- [ ] **`.env` et fichiers sensibles** ignorés par le VCS (`.gitignore`)
-- [ ] **Chiffrement** : HTTPS/TLS en transit, chiffrement au repos des données sensibles
-- [ ] **PRNG** : générateur cryptographiquement sûr pour tokens/secrets/IDs de session (jamais `rand()`/PRNG standard)
-
-#### 8.6 Abus & disponibilité
-- [ ] **Bruteforce** : rate limiting / throttling sur login, reset, endpoints d'auth
-- [ ] **DoS** : limites sur taille de payload, pagination, timeouts, quotas sur opérations coûteuses
-- [ ] **Upload de fichiers** : validation du type MIME + taille côté serveur, stockage hors webroot
-
-#### 8.7 Exposition d'informations
-- [ ] **Pas de données sensibles** dans les logs (mots de passe, tokens, PII)
-- [ ] **Messages d'erreur** génériques en production (pas de stack trace / détail interne exposé)
-- [ ] **Stockage côté client** (front/mobile) : pas de secret/token sensible en localStorage/stockage non sécurisé
-- [ ] **Dépendances / composants** : pas de version vulnérable connue (audit des dépendances)
-
----
-
-### 9) Exceptions & Logs
-
-- [ ] **Exceptions métier** explicites avec messages clairs
-- [ ] **Code HTTP** approprié pour les erreurs (400, 403, 404, 422, 500)
-- [ ] **Logs critiques** avec contexte suffisant
-- [ ] **Pas d'instruction de debug oubliée** en production (fonctions interdites listées dans la règle de stack)
-- [ ] **Pas de données sensibles** dans les logs (mots de passe, tokens)
-
----
-
-### 10) Tests
-
-- [ ] **Logique métier critique** couverte par des tests unitaires
-- [ ] **Contrôleurs/routes** couverts par des tests d'intégration
-- [ ] **Tests unitaires ultra-rapides** (sans persistance pour logique pure)
-- [ ] Conventions de test respectées (voir `agent-project/tests.md`)
-
----
-
-### 11) Documentation & Propreté
-
-- [ ] **Code auto-documenté** : noms explicites, pas de docblocks qui dupliquent les types
-- [ ] **Commentaires** uniquement pour logique non évidente ou contraintes spécifiques
-- [ ] **Pas de code commenté** sans raison expliquée
-- [ ] **Pas de `TODO`** sans ticket/issue associé
-
----
-
-### 11bis) Ponytail (parcimonie)
-
-> Partie vérifiable de `agent/rules/ponytail.md` (source de compilation de ce ruleset).
-
-- [ ] **Pas d'abstraction non demandée** (interface/couche/généricité sans besoin réel)
-- [ ] **Pas de dépendance évitable** (stdlib ou dépendance déjà installée préférée)
-- [ ] **Suppression > ajout** : pas de code mort, pas de fichier/boilerplate superflu
-- [ ] **Fix à la racine** : fonction partagée corrigée une fois, pas chaque appelant
-- [ ] **Raccourcis marqués `ponytail:`** (avec plafond + chemin d'upgrade si limite connue)
-- [ ] **Logique non triviale** accompagnée d'au moins UN check runnable
-
----
-
-### 12) Règles de la stack
-
-> Appliquer toutes les règles du/des fichier(s) `agent/stacks/<langage>/...` correspondant à la stack détectée
-> (langage + framework : typage, debug interdit, i18n, ORM, sécurité propres à la techno).
-
----
-
-### 13) Règles projet spécifiques
-
-> Appliquer toutes les règles de `agent-project/check.md` :
-> architecture, nommage, ORM, composants, events propres à CE projet.
-> Ce fichier est le complément obligatoire du présent audit.
-
----
-
-## Format du rapport d'audit
+### Format du rapport
 
 ```markdown
-# Rapport d'Audit — [Module/Feature]
+# Audit — [cible]
 
-## Points Positifs
-- ...
+## Vérifications
+- Tests : [commande] → [résultat réel] · Lint : … · Analyse statique : … · Dépendances : …
+- Non vérifié : [règle] — [raison]
 
-## Points d'Attention
-- ...
+## Violations
+| Règle | Sévérité | Fichier:ligne | Correction |
+|---|---|---|---|
 
-## Problèmes Critiques
-### [Catégorie]
-1. **Problème**
-   - VIOLATION : règle violée
-   - Fichier : `chemin/fichier:ligne`
-   - Action : correction précise
-
-## Actions Correctives (Priorisées)
-### CRITIQUES (Immédiat)
-1. Action (effort estimé)
-
-### MOYENS (À planifier)
-1. ...
-
-### MINEURS (Nice to have)
-1. ...
-
-## Recommandations
-- ...
-
-## Métriques
-- Conformité globale : X%
-- Violations critiques : X
-- Effort total estimé : Xh
+## Conformité au plan (si plan)
+- Étapes non faites / hors périmètre : …
 ```
 
 ---
 
-## Priorités
+## Plan
 
-### CRITIQUES (Bloquer)
-- Plan validé non couvert (exigence oubliée) ou écart au plan non justifié
-- Single responsibility violé
-- Typage manquant alors que le langage le permet
-- Routes sensibles non protégées
-- Texte affiché en dur alors que le projet utilise l'i18n
-- Duplication de logique métier
-- Instruction de debug laissée en production (voir règle de stack)
-- Sécurité : injection (SQL/NoSQL/commande), XSS, CSRF absent sur mutation
-- Sécurité : autorisation/authentification absente ou contournable (IDOR)
-- Sécurité : secret / clé API en dur dans le code ou le dépôt
-- Sécurité : mot de passe en clair / PRNG non sûr pour token ou secret
-- Sécurité : identifiant par défaut ou compte de test actif en production
-- Règles CRITIQUES de la stack (`agent/stacks/...`) violées
-- Règles CRITIQUES de `agent-project/check.md` violées
+- **PLAN-01** · CRITIQUE — Chaque étape du plan validé est implémentée ; aucun ajout hors périmètre sans accord ; tout écart est justifié.
 
-### MOYENS
-- N+1 queries
-- Validation répétée (créer validator)
-- Migrations/jobs sans gestion d'erreur
-- Logs sans contexte
-- Sécurité : rate limiting absent (bruteforce), pas de limite anti-DoS
-- Sécurité : en-têtes manquants (CORS trop permissif, CSP/HSTS absents)
-- Sécurité : données sensibles dans logs ou messages d'erreur détaillés
-- Sécurité : dépendance / composant en version vulnérable connue
-- Abstraction non demandée / dépendance évitable (ponytail)
-- Fix de symptôme au lieu de la cause racine (ponytail)
+## Architecture
 
-### MINEURS
-- Imports inutilisés
-- Docblocks qui dupliquent les types
-- `TODO` sans ticket
-- Raccourci intentionnel non marqué `ponytail:`
+- **ARCH-01** · CRITIQUE — Une classe ou un fichier = une responsabilité.
+- **ARCH-02** · CRITIQUE — Pas de logique métier durable dans un contrôleur, handler, job ou listener : déléguer.
+- **ARCH-03** · MOYEN — Nommage conforme aux conventions de `agent-project/memory.md`.
+- **ARCH-04** · MOYEN — Fichiers placés selon la structure décrite dans `agent-project/architecture.md`.
+
+## Typage
+
+- **TYPE-01** · CRITIQUE — Typage aussi strict que le langage le permet (paramètres, retours, propriétés).
+- **TYPE-02** · MOYEN — Pas de type fourre-tout sans justification (mots-clés exacts dans la stack).
+- **TYPE-03** · MINEUR — Pas d'import inutilisé.
+
+## Duplication
+
+- **DUP-01** · CRITIQUE — Pas de logique métier dupliquée : réutiliser l'existant, extraire au deuxième usage réel.
+- **DUP-02** · MOYEN — Pas de vue ou de template répété : composant existant, ou nouveau composant au deuxième usage.
+- **DUP-03** · MOYEN — Pas de requête identique répétée : la réutiliser (scope, méthode), sans couche dédiée par défaut.
+- **DUP-04** · MOYEN — Pas de validation répétée : règle de validation réutilisable.
+- **DUP-05** · MOYEN — Pas de valeur métier en dur répétée : enum, constante ou config.
+
+## Internationalisation
+
+- **I18N-01** · CRITIQUE — Si le projet a de l'i18n : aucun texte affiché en dur (fonctions exactes dans la stack).
+- **I18N-02** · MOYEN — Messages d'erreur clairs, traduits si i18n.
+
+## Validation
+
+- **VAL-01** · CRITIQUE — Toute donnée externe est validée côté serveur.
+- **VAL-02** · MOYEN — Validation complexe ou réutilisée dans un validateur dédié, pas inline.
+
+## Routes
+
+- **ROUTE-01** · MINEUR — Routes groupées par contexte, nommage explicite et cohérent.
+- **ROUTE-02** · MOYEN — Middlewares appliqués aux groupes plutôt que route par route.
+
+## Performance
+
+- **PERF-01** · MOYEN — Pas de requête dans une boucle (N+1) : chargement anticipé selon l'ORM.
+- **PERF-02** · MOYEN — Grandes listes paginées.
+- **PERF-03** · MINEUR — Index sur les colonnes filtrées ou jointes fréquemment.
+
+## Sécurité — socle (non désactivable)
+
+- **SEC-01** · CRITIQUE · socle — Authentification et autorisation vérifiées côté serveur pour chaque action non publique ; jamais seulement côté client.
+- **SEC-02** · CRITIQUE · socle — Ownership : un utilisateur n'accède qu'à ses propres ressources (IDOR).
+- **SEC-03** · CRITIQUE · socle — Pas d'injection : requêtes paramétrées, aucune entrée concaténée dans une commande système, pas de désérialisation de données non fiables.
+- **SEC-04** · CRITIQUE · socle — Sorties échappées selon le contexte (HTML, attribut, JS, URL).
+- **SEC-05** · CRITIQUE · socle — Protection CSRF sur toute mutation authentifiée par cookie.
+- **SEC-06** · CRITIQUE · socle — Aucun secret en dur (code, dépôt, logs, réponses) ; fichiers d'environnement ignorés par git.
+- **SEC-07** · CRITIQUE · socle — Mots de passe hachés (bcrypt, argon2) ; tokens, identifiants de session et liens de reset générés par un PRNG cryptographique, à usage unique et expirants.
+- **SEC-08** · CRITIQUE · socle — Upload : type et taille vérifiés côté serveur, stockage hors webroot, nom de fichier généré.
+
+## Sécurité — autres règles
+
+- **SEC-09** · CRITIQUE — Aucun identifiant par défaut ni compte de test actif hors développement.
+- **SEC-10** · CRITIQUE — Chemin de fichier construit depuis une entrée : normalisé et confiné à un dossier autorisé.
+- **SEC-11** · CRITIQUE — Appel HTTP vers une URL fournie : hôtes autorisés explicitement, adresses internes refusées (SSRF).
+- **SEC-12** · CRITIQUE — Webhook entrant : signature vérifiée avant tout traitement.
+- **SEC-13** · MOYEN — Session régénérée au login, expirante, invalidée au logout.
+- **SEC-14** · MOYEN — Limitation de débit sur login, reset et endpoints d'authentification.
+- **SEC-15** · MOYEN — Limites anti-abus : taille de requête, pagination, timeouts sur les opérations coûteuses.
+- **SEC-16** · MOYEN — Erreurs génériques en production, sans trace ni détail interne.
+- **SEC-17** · MOYEN — Ni mot de passe, ni token, ni donnée personnelle dans les logs.
+- **SEC-18** · MOYEN — Côté client : aucun token sensible en stockage non sécurisé (localStorage).
+- **SEC-19** · MOYEN — Dépendances sans vulnérabilité connue, **vérifié par l'outil** (`composer audit`, `npm audit`).
+- **SEC-20** · MOYEN — Export CSV ou tableur : cellules commençant par `=`, `+`, `-`, `@` neutralisées.
+- **SEC-21** · MOYEN — Redirection vers une URL fournie : destinations autorisées explicitement.
+- **SEC-22** · MOYEN — Données personnelles : collecte limitée au nécessaire, durée de conservation définie, export et suppression possibles.
+- **SEC-23** · MOYEN — En-têtes et transport : HTTPS, HSTS, CSP, `X-Content-Type-Options`, `frame-ancestors` ; CORS sans `*` avec credentials. Vérifiés à l'`init` et par `audit fichiers agent`, consignés dans `agent-project/security.md`.
+
+## Erreurs et logs
+
+- **LOG-01** · MOYEN — Exceptions métier explicites, codes HTTP adaptés (400, 403, 404, 422, 500).
+- **LOG-02** · MOYEN — Jobs, migrations et intégrations : échecs gérés et journalisés avec contexte.
+- **LOG-03** · CRITIQUE — Aucune instruction de debug oubliée (liste dans la stack).
+
+## Propreté
+
+- **DOC-01** · MINEUR — Code auto-documenté ; pas de commentaire ou docblock qui répète le typage.
+- **DOC-02** · MINEUR — Pas de code commenté sans raison, pas de `TODO` sans ticket.
+
+## Parcimonie (`agent/rules/ponytail.md`)
+
+- **PONY-01** · MOYEN — Pas d'abstraction non demandée : interface, couche, repository, cache ou généricité sans besoin réel et présent.
+- **PONY-02** · MOYEN — Pas de dépendance évitable (stdlib, plateforme ou dépendance déjà installée d'abord).
+- **PONY-03** · MOYEN — Bug corrigé à la racine (fonction partagée), pas chez chaque appelant.
+- **PONY-04** · MINEUR — Pas de code mort ni de fichier superflu.
+- **PONY-05** · MINEUR — Raccourci volontaire marqué `ponytail:`, avec son plafond et le chemin d'évolution s'il est connu.

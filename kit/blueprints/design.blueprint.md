@@ -107,7 +107,7 @@ Proposer pour validation.
 
 ## Règles de maintenance de design.md
 
-- **Taille cible** : ≤ 200 lignes
+- Rester concis : pointer vers les composants plutôt que les décrire
 - Pointer vers les fichiers de composants réels, ne pas les redocumenter ici
 - Mettre à jour quand un nouveau composant est ajouté au projet
 - Ne pas dupliquer les règles qui sont dans `memory.md`

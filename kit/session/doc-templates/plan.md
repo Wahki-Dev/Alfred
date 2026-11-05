@@ -1,70 +1,57 @@
 ---
 feature: slug-court
-statut: brouillon        # brouillon | validé | en_cours | terminé
-current: 0
-total: 0
-securite: non           # requise | non — si requise : revue sécurité bloquante en fin (workflow §8)
+statut: brouillon     # brouillon | en_cours | terminé | abandonné
+securite: non         # requise | non — requise : revue sécurité bloquante en fin de feature
+tests: oui            # oui | non (« OK sans tests »)
 ---
 
 # Plan — [Nom de la feature]
 
 > Fichier : `agent-project/plans/AAAA-MM-JJ-HHMM-slug.md`
-> Date : [AAAA-MM-JJ HH:MM]
-> État d'avancement : front-matter ci-dessus (source de vérité de la progression)
+> Sections marquées *(si utile)* : à supprimer quand elles ne s'appliquent pas.
 
-## Contexte
-- Pourquoi
-- Comportement actuel
+## Objectif
+- Pourquoi, et comportement actuel
+- Non-objectifs :
 
-## Objectifs / Non-objectifs
-- Objectifs:
-- Non-objectifs:
+## Fichiers concernés
+- À lire :
+- À modifier / créer :
 
-## Exigences (avec tests associés)
-1. Exigence A
-   - Vérification: (comment prouver que ça marche)
-2. Exigence B
-   - Vérification:
+## Étapes
+- [ ] 1. …
+- [ ] 2. …
 
-> Ajouter des tests uniquement sur demande explicite de l'utilisateur, selon
-> `agent-project/tests.md`. Ne couvrir que le code applicatif ou métier testable,
-> jamais les mécanismes du framework, de l'ORM ou les migrations.
+## Vérification
+| Exigence | Preuve |
+|---|---|
+| … | test `…` (agent/rules/tests.md) ou commande `…` |
 
-## Règles métier concernées
-- Existantes : `BR-NNN` — [titre]
-- Nouvelles / modifiées : [règle certaine à synchroniser automatiquement dans `agent-project/business-rules.md`]
-- Ambiguïtés à clarifier : [si applicable]
-
-## Architecture (décisions minimales)
-- Option retenue + justification
-- Alternatives rejetées + pourquoi
-
-## Modèles de données
-- Schémas / types / migrations
-- Contraintes & validations
-
-## Changements (où)
-- Fichiers à lire:
-- Fichiers à modifier/créer:
-
-## Erreurs & edge cases
-- ...
+## Règles métier
+- Existantes concernées : `BR-…`
+- Nouvelles ou modifiées (écrites en fin de feature si le plan est validé) : …
+- Ambiguïtés à trancher : …
 
 ## Implications transverses
-> Posture lead / architecte. Chaque axe est renseigné. `non concerné` exige une raison.
 - Code :
-- Traitement asynchrone :
+- Asynchrone :
 - Exploitation :
 - Infrastructure :
 
-## Rapport d’incident
-> À compléter pendant l’implémentation uniquement en cas d’incident.
-- Erreur :
-- Cause :
-- Impact :
-- Correctif :
-- Vérification :
+## Modèle de données *(si utile)*
+- Schémas, migrations, contraintes
 
-## Questions non résolues (ultra concises)
-- Q1:
-- Q2:
+## Décision d'architecture *(si utile)*
+- Option retenue + pourquoi · alternatives écartées
+- Direction `ddd-lite` et nouvelle zone métier : résultat du test de décision
+
+## Questions
+- …
+
+## Notes d'implémentation *(remplie pendant l'implémentation, si besoin)*
+- Écart, incident, cause, correctif
+
+## Revue sécurité *(remplie en fin de feature si `securite: requise`)*
+- Violations socle : …
+- Autres risques : …
+- Vérifié (outil ou code cité) / non vérifié : …

@@ -1,8 +1,9 @@
 # Ponytail — Philosophie de code (lazy senior)
 
 > Règle universelle (portable, jamais spécifique à un projet ou une stack).
-> **Process** : référencée par `agent/rules/workflow.md` (PLAN + IMPLEMENT).
-> **Audit** : source de compilation de `agent-project/check.md` (voir `agent/blueprints/check.blueprint.md`).
+> **Process** : référencée par `agent/rules/workflow.md` (plan et implémentation).
+> **Audit** : sa partie vérifiable est la section « Parcimonie » de `agent/rules/audit.md` (PONY-01 à 05).
+> En cas de conflit avec une autre règle d'audit, ponytail l'emporte.
 
 Lazy = efficace, pas négligent. Le meilleur code est celui qu'on n'écrit pas.
 
@@ -48,6 +49,6 @@ sécurité, l'accessibilité, la calibration que le matériel réel exige (la pl
 jamais l'idéal du spec : une horloge dérive, un capteur lit faux), tout ce qui est
 explicitement demandé.
 
-Du code lazy sans son check est inachevé : toute logique non triviale laisse UN check runnable
-(une démo/self-check à base d'assert, ou un petit fichier de test ; sans framework, sans
-fixtures). Un one-liner trivial n'a pas besoin de test.
+Du code lazy sans sa vérification est inachevé : toute logique non triviale est couverte selon
+`agent/rules/tests.md` (un test dans le framework du projet ; à défaut, un check runnable à base
+d'assertions). Un one-liner trivial n'a pas besoin de test.

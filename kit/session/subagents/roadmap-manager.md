@@ -24,29 +24,27 @@ Construire une vue produit simple, lisible, et synchronisable avec les plans de 
 
 - Nouveau projet vierge pendant `init`
 - Demande explicite : `roadmap`, `feuille de route`, `planifier`
-- Création ou validation d'un plan de feature qui correspond à une tâche roadmap
-- Fin d'une tâche de workflow quand `agent-project/roadmap.md` existe
+- Fin de feature quand `agent-project/roadmap.md` existe (`agent/rules/workflow.md` §5) — jamais à chaque étape du plan
 
 ## Règles
 
 - Toujours lire `agent-project/roadmap.md` s'il existe avant de proposer une modification.
-- Toujours lire le plan actif avant de synchroniser une tâche roadmap.
+- Toujours lire le plan de la feature avant de synchroniser une tâche roadmap.
 - Ne jamais remplacer le front-matter du plan : le plan reste la source de vérité du workflow.
 - La roadmap est une vue produit ; elle ne doit pas contenir le détail d'implémentation.
-- Une tâche roadmap ne passe à `terminé` qu'après validation de fin de tâche ou de fin de feature.
+- Une tâche roadmap ne passe à `terminé` qu'en fin de feature, après validation.
 - Si aucune tâche roadmap ne correspond clairement, proposer une création ou demander confirmation.
 - Toute mise à jour est proposée sous forme de diff ou de section modifiée, puis appliquée seulement après validation.
 
-## Synchronisation en fin de tâche
+## Synchronisation en fin de feature
 
-Quand une tâche du workflow est terminée :
-1. Lire le bloc `Roadmap` de la tâche NOW s'il existe.
-2. Sinon, chercher dans `agent-project/roadmap.md` une tâche liée au plan actif ou au même objectif.
-3. Si une tâche correspond avec certitude :
+Quand une feature est terminée :
+1. Chercher dans `agent-project/roadmap.md` la ou les tâches liées au plan (lien explicite) ou au même objectif.
+2. Si une tâche correspond avec certitude :
    - proposer de passer son statut à `terminé`
    - mettre à jour `Dernière mise à jour`
    - conserver le lien vers le plan
-4. Si la correspondance est incertaine :
+3. Si la correspondance est incertaine :
    - afficher les candidates
    - demander laquelle mettre à jour
 

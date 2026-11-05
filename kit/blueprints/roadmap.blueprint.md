@@ -86,5 +86,5 @@ Présenter le draft complet et attendre validation avant de créer ou modifier `
 - Toute tâche terminée doit avoir une date de mise à jour récente.
 - Lier une tâche à un plan quand un fichier `agent-project/plans/...` existe.
 - Ne pas dupliquer le détail des plans de feature.
-- Mettre à jour le statut d'une tâche roadmap quand la tâche de workflow correspondante est terminée.
+- Mettre à jour le statut d'une tâche roadmap en fin de feature, quand le plan correspondant est terminé.
 - Proposer la mise à jour et attendre validation avant écriture.

@@ -84,14 +84,15 @@ Après validation, mettre ou proposer une référence courte dans `agent-project
 ### Infrastructure
 [Persistance, clients externes, fichiers, mail, logs, adapters]
 
-## Règles de dépendances
-- [Règle vérifiable]
+## Dépendances entre couches
+- [Qui dépend de qui, tel que le projet le fait]
+- Direction `ddd-lite` : périmètre exact de la zone DDD (dossiers), le reste est en `custom`
 
 ## Patterns retenus
 - [Pattern] : [quand l'utiliser]
 
-## Patterns interdits / à éviter
-- [Anti-pattern] : [pourquoi]
+## Patterns à éviter
+- [Anti-pattern observé] : [pourquoi] — à imposer ? le proposer comme règle `PRJ-NN` dans `agent-project/rules.md`
 
 ## Persistance et transactions
 - [Règles ORM / repositories / queries]
@@ -105,9 +106,6 @@ Après validation, mettre ou proposer une référence courte dans `agent-project
 ## Tests par niveau
 - [Niveau] : [objectif + emplacement]
 
-## Checklist d'audit architecture
-- [ ] [Point vérifiable]
-
 ## Recommandations / dette connue
 - [Écart observé ou amélioration proposée]
 ```
@@ -116,9 +114,9 @@ Après validation, mettre ou proposer une référence courte dans `agent-project
 
 ## Règles de maintenance de architecture.md
 
-- Taille cible : ≤ 250 lignes
-- Détailler l'architecture ici, pas dans `memory.md`
-- Garder `memory.md` comme résumé ; le routing vers ce fichier est assuré par `AGENT.md §2`
-- Mettre à jour quand une décision structurante change
-- Compiler les règles vérifiables dans `agent-project/check.md` lors de `regen check`
+- Fichier **descriptif** : il dit ce qui existe et ce qui est retenu. Les règles vérifiées à l'audit sont
+  celles de la direction dans le kit (`agent/technical-directions/`) et celles de `agent-project/rules.md` :
+  ne pas les recopier ici.
+- Détailler l'architecture ici, pas dans `memory.md` (qui n'en garde qu'un résumé)
+- Mettre à jour quand une décision structurante change (proposition + validation)
 - Ne jamais documenter une architecture cible comme déjà existante

@@ -1,20 +1,18 @@
 # agent-project/
 
-Ce dossier contient les fichiers générés par l'IA pour CE projet.
-Ne pas copier son contenu d'un projet à l'autre.
+Mémoire de l'agent pour CE projet. Commitée avec l'app, jamais modifiée par une mise à jour du kit.
+Ne pas copier son contenu d'un projet à l'autre (sauf `rules.md`, si l'équipe partage ses règles).
 
-Les blueprints de génération sont dans `agent/blueprints/`.
+| Fichier | Rôle | Qui l'écrit |
+|---|---|---|
+| `memory.md` | Stack, commandes de vérification, structure, conventions observées | l'agent, après validation |
+| `rules.md` | Règles de l'équipe et surcharges des règles du kit | l'équipe |
+| `architecture.md` | Direction technique et structure réelle | l'agent, après validation |
+| `business-rules.md` | Règles métier actives et leur historique | l'agent, après validation (via le plan) |
+| `security.md` | Socle sécurité et limites assumées | l'agent, après validation |
+| `design.md` | Composants et règles UI (si interface) | l'agent, après validation |
+| `cdc.md`, `roadmap.md` | Cadrage produit et roadmap (optionnels) | l'agent, après validation |
+| `recettage.md` | Configuration du module recettage (optionnel) | l'équipe |
+| `plans/` | Un plan par feature : étapes, vérification, revue sécurité | l'agent ; validé par ton OK |
 
-Fichiers principaux :
-- `memory.md` : mémoire projet, résumé des conventions et règles (le routing est dans `AGENT.md §2`)
-- `business-rules.md` : index vivant des règles métier actives et historique de leurs évolutions
-- `architecture.md` : direction technique détaillée, structure, dépendances et patterns
-- `check.md` : ruleset d'audit compilé
-- `cdc.md` : cahier des charges produit
-- `roadmap.md` : roadmap produit avec statuts de tâches
-- `plans/` : plans de feature avec état d'avancement en front-matter
-
-Sur tout projet, vierge ou existant, l'agent doit proposer ou générer `architecture.md` via `agent/blueprints/architecture.blueprint.md`.
-Sur tout projet, l'agent crée automatiquement `business-rules.md` via `agent/blueprints/business-rules.blueprint.md`, puis le synchronise sans doublon dès qu'une règle métier certaine apparaît. Une ambiguïté ou contradiction doit être clarifiée avant écriture.
-Sur un projet vierge, l'agent doit proposer et aider à rédiger `cdc.md` puis `roadmap.md`.
-Les tâches de `roadmap.md` doivent avoir un statut, mis à jour quand la tâche correspondante est terminée.
+Fichiers créés par la commande `init` (voir `agent/commands.md`). Modèles : `agent/blueprints/`.

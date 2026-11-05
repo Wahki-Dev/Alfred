@@ -1,0 +1,56 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  kit:
+    name: Kit (liens, identifiants, commandes)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: bash tests/check-kit.sh
+
+  shell:
+    name: Installeur sh (${{ matrix.os }})
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: shellcheck
+        if: runner.os == 'Linux'
+        run: shellcheck install.sh tests/*.sh
+      - run: bash tests/install-test.sh
+
+  powershell:
+    name: Installeur PowerShell
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: ASCII uniquement (Windows PowerShell 5.1 lit les .ps1 sans BOM en ANSI)
+        shell: bash
+        run: |
+          for f in install.ps1 tests/*.ps1; do
+            if [ "$(LC_ALL=C tr -d '\000-\177' < "$f" | wc -c)" -ne 0 ]; then
+              echo "Caractères non ASCII dans $f" >&2
+              exit 1
+            fi
+          done
+      - name: PSScriptAnalyzer
+        shell: pwsh
+        run: |
+          Install-Module PSScriptAnalyzer -Force -Scope CurrentUser
+          $issues = Invoke-ScriptAnalyzer -Path install.ps1 -Severity Error, Warning -ExcludeRule PSAvoidUsingWriteHost
+          $issues | Format-Table -AutoSize
+          if ($issues) { exit 1 }
+      - name: Test d'installation (Windows PowerShell 5.1)
+        shell: powershell
+        run: ./tests/install-test.ps1
+      - name: Test d'installation (PowerShell 7)
+        shell: pwsh
+        run: ./tests/install-test.ps1

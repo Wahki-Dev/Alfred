@@ -83,7 +83,7 @@ Proposer le draft pour validation avant écriture.
 
 ## Règles de maintenance de cdc.md
 
-- Taille cible : ≤ 200 lignes
+- Rester lisible par un non-technicien : concis, sans détail d'implémentation
 - Garder un langage compréhensible par un non-technicien
 - Ne pas dupliquer les conventions techniques de `memory.md`
 - Mettre à jour quand le périmètre produit change
