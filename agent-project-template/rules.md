@@ -14,8 +14,9 @@
 Format : - **PRJ-NN** · CRITIQUE|MOYEN|MINEUR — règle
          - Vérification : commande lancée par l'agent (optionnel)
 Exemples :
-- **PRJ-01** · CRITIQUE — Tout texte affiché a une clé de traduction dans `lang/fr` ET `lang/es`.
-- **PRJ-02** · MOYEN — Les scopes et relations Eloquent porteurs d'une règle sont testés avec la base de test.
+- **PRJ-01** · CRITIQUE — Les montants sont des entiers en centimes, jamais des float.
+- **PRJ-02** · MOYEN — Tout appel à une API externe passe par un client dédié (`app/Clients/`) avec timeout.
+- **PRJ-03** · MOYEN — Les dates sont stockées en UTC et affichées dans le fuseau de l'utilisateur.
 -->
 
 ## Désactivations
@@ -23,7 +24,8 @@ Exemples :
 <!--
 Format : - **ID** (rappel de la règle) — raison — AAAA-MM-JJ
 Exemple :
-- **TEST-03** (ne pas tester l'ORM) — l'équipe teste aussi la couche ORM — 2026-11-05
+- **LAR-05** (FormRequest) — on valide les entrées avec des DTO laravel-data — 2026-11-05
+- **CUS-02** (pas de repository sans besoin) — l'équipe impose un repository par agrégat — 2026-11-05
 -->
 
 ## Sévérités
@@ -31,7 +33,7 @@ Exemple :
 <!--
 Format : - **ID** : ANCIENNE → NOUVELLE — raison
 Exemple :
-- **LAR-06** : MINEUR → MOYEN — les composants Blade sont la norme de l'équipe
+- **PERF-01** : MOYEN → CRITIQUE — nos listes dépassent les 10 000 lignes
 -->
 
 ## Portée

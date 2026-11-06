@@ -1,7 +1,7 @@
 # Tests — Politique unique du kit
 
 > Lu pendant le plan, l'implémentation et l'audit. Identique pour tous les projets ; une équipe l'adapte
-> dans `agent-project/rules.md` (ex : désactiver TEST-03 si elle teste aussi l'ORM).
+> dans `agent-project/rules.md` (ajout, désactivation, sévérité ou portée d'une règle).
 > Ce qui est propre au projet (framework, dossiers, commande de test) est dans `agent-project/memory.md`.
 
 ---

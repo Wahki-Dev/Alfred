@@ -1,33 +1,104 @@
-# Agent — kit de règles pour IA de code
+# Alfred
 
-Écosystème de fichiers Markdown qui cadre le travail d'une IA de code (Cursor, Claude Code,
-GitHub Copilot…) sur un projet : règles portables, mémoire spécifique au projet, règles propres
-à l'équipe, workflow contrôlé (plan → revue → OK → code) et audit.
+**Ton IA de code réfléchit avant de coder, teste ce qu'elle écrit, et respecte les règles de ton équipe.**
 
-**v1 : PHP (Laravel, Symfony, CakePHP).** Les règles universelles s'appliquent à toute stack ;
-les règles de stack existent seulement pour PHP.
+Claude Code, Cursor ou Copilot écrivent du code très vite. Souvent trop vite : ils foncent sans plan,
+oublient tes conventions d'une session à l'autre, réinventent un helper qui existe déjà, ne lancent
+pas les tests, et ne se posent aucune question de sécurité tant qu'on ne leur demande pas.
 
-Le contenu du kit est rédigé en **français**.
+Alfred est un ensemble de règles en Markdown que tu installes dans ton projet. Ton IA le lit au
+début de chaque session et travaille ensuite comme un développeur senior un peu maniaque : elle
+propose un plan, attend ton feu vert, puis livre du code vérifié.
 
-Fonctionnement détaillé et commandes : [`kit/README.md`](kit/README.md) et [`kit/commands.md`](kit/commands.md).
+## À quoi ça ressemble
 
----
+```
+Toi    › Ajoute l'export CSV des factures, filtrable par client.
 
-## Installation et mise à jour
+Alfred › Plan écrit : agent-project/plans/2026-11-06-1030-export-csv-factures.md
+         4 étapes, 3 tests prévus.
+         Feature sensible (export de fichiers) : revue sécurité obligatoire en fin de feature.
+         ✋ Réponds OK pour lancer l'implémentation.
 
-Depuis la **racine du dépôt git** du projet (prérequis : `git`). La même commande installe et met à jour.
+Toi    › OK
 
-**Windows (PowerShell)** :
+Alfred › Étapes 1 à 4 terminées.
+         Tests : 12 passés · Larastan : OK · composer audit : aucune vulnérabilité
+         Revue sécurité : injection CSV neutralisée (src/Exports/InvoiceCsv.php:42)
+         Plan terminé.
+```
+
+Tu n'interviens qu'une fois, pour valider le plan. Pour un changement trivial (un libellé, une
+couleur), Alfred applique directement et te montre le diff.
+
+## Ce que ça change au quotidien
+
+**Un plan avant chaque feature.** Il dit quels fichiers bougent, comment chaque exigence sera
+vérifiée, et ce que la feature peut casser ailleurs : jobs, files, config, déploiement. Il est relu
+avant de t'être présenté, et il reste dans le dépôt. Si la session s'interrompt, « reprends le plan
+export-csv » suffit.
+
+**Des tests qui tournent vraiment.** Une règle métier, un calcul ou un bug corrigé reçoit son test.
+Alfred lance tes outils (tests, analyse statique, audit des dépendances) et rapporte leur résultat
+réel. Ce qu'il n'a pas pu vérifier, il le dit.
+
+**Moins de code.** Avant d'écrire quoi que ce soit, il cherche si ça existe déjà dans le projet,
+dans la bibliothèque standard ou dans une dépendance installée. Pas de couche « au cas où ».
+
+**La sécurité de base n'est pas négociable.** Autorisation côté serveur, accès aux données des
+autres, injections, XSS, CSRF, secrets, mots de passe, upload : vérifiés sur chaque feature
+sensible, et impossibles à désactiver. Alfred se méfie aussi de ce qu'il lit : une instruction
+glissée dans un ticket ou une page web est signalée, jamais exécutée, et il ne lit pas ton `.env`.
+
+**Une mémoire du projet.** Stack, conventions, architecture, règles métier : tout est écrit dans
+`agent-project/`, versionné avec ton code. La session suivante repart de là, pas de zéro.
+
+## Les règles de ton équipe
+
+Chaque règle d'Alfred a un identifiant (`SEC-02`, `TEST-03`, `LAR-04`…). Ton équipe peut en ajouter,
+en désactiver ou en durcir dans un seul fichier, `agent-project/rules.md` :
+
+```markdown
+## Ajouts
+- **PRJ-01** · CRITIQUE — Les montants sont des entiers en centimes, jamais des float.
+
+## Désactivations
+- **LAR-05** (FormRequest) — on valide les entrées avec des DTO laravel-data — 2026-11-05
+
+## Sévérités
+- **PERF-01** (N+1) : MOYEN → CRITIQUE — nos listes dépassent les 10 000 lignes
+
+## Portée
+- **PHP-01** (`strict_types`) : nouveaux fichiers seulement — le legacy n'est pas typé
+```
+
+Ces règles s'appliquent quand l'IA code, pas seulement à l'audit. Et comme les règles du kit sont
+lues telles quelles, deux projets avec la même version et le même `rules.md` sont jugés exactement
+de la même façon.
+
+## Installation
+
+Depuis la racine du dépôt git de ton projet. La même commande installe et met à jour.
+
+**Windows (PowerShell)**
 ```powershell
 irm https://raw.githubusercontent.com/Wahki-Dev/Alfred/main/install.ps1 | iex
 ```
 
-**macOS / Linux** :
+**macOS / Linux**
 ```bash
 curl -fsSL https://raw.githubusercontent.com/Wahki-Dev/Alfred/main/install.sh | sh
 ```
 
-Version précise (ex : `v1.0.0`) :
+Ouvre ensuite ton IDE et tape `init` : Alfred analyse le projet et te propose sa mémoire en deux
+validations.
+
+Le script installe le kit dans `agent/`, crée `agent-project/` s'il n'existe pas (il n'y touche
+plus jamais ensuite) et ajoute les fichiers de démarrage pour Claude Code, Cursor, Copilot et les
+outils qui lisent `AGENTS.md`. Commite les deux dossiers : tes collègues ont Alfred dès le
+`git clone`.
+
+Pour figer une version :
 ```powershell
 $env:AGENT_KIT_VERSION = "v1.0.0"; irm https://raw.githubusercontent.com/Wahki-Dev/Alfred/main/install.ps1 | iex
 ```
@@ -35,80 +106,31 @@ $env:AGENT_KIT_VERSION = "v1.0.0"; irm https://raw.githubusercontent.com/Wahki-D
 curl -fsSL https://raw.githubusercontent.com/Wahki-Dev/Alfred/main/install.sh | sh -s -- v1.0.0
 ```
 
-Le script :
-1. télécharge la dernière version stable publiée (les pré-versions `-rc`, `-beta` sont ignorées),
-   ou celle demandée ;
-2. remplace `agent/` par le kit de cette version (remplacement atomique, avertissement si
-   `agent/` contient des modifications non commitées) et écrit la version et le SHA du commit
-   dans `agent/VERSION` ;
-3. crée `agent-project/` (mémoire de l'app) s'il manque, sans jamais toucher à son contenu,
-   dont `agent-project/rules.md` : les **règles de l'équipe** (ajouts, désactivations,
-   sévérités, portée), jamais écrasé par une mise à jour ;
-4. crée les fichiers de démarrage IDE (`.cursor/rules/global.mdc`, `CLAUDE.md`, `AGENTS.md`,
-   `.github/copilot-instructions.md`) s'ils sont absents.
+Ne modifie pas `agent/` à la main, la prochaine mise à jour l'écrase : tes règles vont dans
+`agent-project/rules.md`. Les nouveautés de chaque version sont dans le [CHANGELOG](CHANGELOG.md).
 
-`agent/` et `agent-project/` sont commités dans l'app : un `git clone` normal suffit.
-Ne pas modifier `agent/` à la main dans une app : la mise à jour suivante l'écrase.
-Une règle propre à l'équipe ou au projet va dans `agent-project/rules.md`.
-Une correction du kit se fait dans ce dépôt, puis une nouvelle version est publiée.
-
-Après une mise à jour, il n'y a rien à recompiler : relire le [`CHANGELOG.md`](CHANGELOG.md),
-commiter `agent/`, et vérifier que les identifiants de règles cités dans
-`agent-project/rules.md` existent toujours (l'agent le signale au démarrage de session).
-
----
-
-## Versions
-
-Chaque version est un tag git (`v1.0.0`, `v1.1.0`…), détaillée dans [`CHANGELOG.md`](CHANGELOG.md).
-
-- **Patch** (`v1.0.1`) : correction ou reformulation, sans changement de commande ni de chemin.
-- **Mineure** (`v1.1.0`) : ajout (commande, stack, règle) ; l'existant continue de fonctionner.
-- **Majeure** (`v2.0.0`) : rupture (chemin ou commande renommé, identifiant de règle retiré,
-  bootstrap de `AGENT.md` modifié).
-
----
-
-## Migrer une app qui a une ancienne copie du dossier `agent/`
-
-Les anciennes copies gardaient la mémoire de l'app dans `agent/project/`. Le script refuse de
-s'exécuter tant que ce dossier existe, pour ne pas l'écraser.
-
-1. Déplacer `agent/project/` vers `agent-project/` à la racine de l'app.
-2. Relancer le script d'installation.
-3. Supprimer `agent-project/check.md` et `agent-project/tests.md` s'ils existent (remplacés en v1
-   par les règles du kit et `agent-project/rules.md`).
-
----
+**Stacks** : la v1 a des règles dédiées pour PHP (Laravel, Symfony, CakePHP). Sur une autre stack,
+le workflow, les tests, la sécurité et les règles générales fonctionnent déjà ; il manque seulement
+les règles propres au langage. Le kit est rédigé en français.
 
 ## Contribuer
 
-Les règles d'un nouveau langage ou framework s'ajoutent dans ce dépôt, par pull request,
-dans `kit/stacks/<langage>/` (sur le modèle de `kit/stacks/php/`). Le kit reste unique :
-toutes les apps, quel que soit leur langage, reçoivent les mêmes mises à jour des règles communes.
+La contribution la plus utile aujourd'hui : **une nouvelle stack**. Node, Python, Go, Rails… Les
+règles PHP dans [`kit/stacks/php/`](kit/stacks/php/) servent de modèle : une ligne par règle, un
+identifiant, une sévérité, et seulement ce qui est propre à la techno (les principes généraux sont
+déjà dans [`kit/rules/audit.md`](kit/rules/audit.md)).
 
-Chaque règle vérifiable porte un identifiant stable (`SEC-02`, `LAR-04`…), jamais réutilisé.
-Un identifiant retiré est ajouté à `tests/retired-ids.txt`. La CI (`tests/check-kit.sh`)
-vérifie les liens internes, l'unicité des identifiants et le catalogue des commandes.
+Une règle qui manque, une règle qui fait plus de bruit qu'elle n'aide, un comportement de l'IA qui
+t'a surpris : ouvre une issue avec l'exemple concret, c'est souvent plus utile qu'une PR.
 
----
+Avant d'ouvrir une PR :
+- un identifiant de règle n'est jamais réutilisé ; si tu en retires un, ajoute-le à
+  `tests/retired-ids.txt` ;
+- lance `bash tests/check-kit.sh` (liens internes, identifiants, commandes) ;
+- si tu touches aux installeurs : `bash tests/install-test.sh` et `tests/install-test.ps1`.
 
-## Structure du dépôt
-
-```
-kit/                     ← Installé dans agent/ de chaque app
-agent-project-template/  ← Copié dans agent-project/ de l'app (fichiers absents uniquement)
-bootstrap/               ← Fichiers de démarrage IDE copiés à la racine de l'app (absents uniquement)
-docs/                    ← Documents de conception du kit (non installés)
-tests/                   ← Scripts de vérification du dépôt (CI)
-install.ps1              ← Installation / mise à jour (Windows)
-install.sh               ← Installation / mise à jour (macOS / Linux)
-CHANGELOG.md
-LICENSE
-```
+Les choix de conception de la v1 sont expliqués dans [`docs/spec-v1.md`](docs/spec-v1.md).
 
 ---
 
-## Licence
-
-[MIT](LICENSE)
+Licence [MIT](LICENSE).
