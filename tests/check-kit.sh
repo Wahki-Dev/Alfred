@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 # Vérifications statiques du kit : liens internes, identifiants de règles, catalogue des commandes.
 # Usage : bash tests/check-kit.sh (depuis n'importe où)
+# Les backticks entre guillemets simples sont voulus (on cherche des backticks littéraux du Markdown).
+# shellcheck disable=SC2016
 set -euo pipefail
 cd "$(dirname "$0")/.."
 

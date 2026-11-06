@@ -96,3 +96,7 @@ finally {
     Remove-Item Env:AGENT_KIT_VERSION -ErrorAction SilentlyContinue
     Remove-Item $work -Recurse -Force -ErrorAction SilentlyContinue
 }
+# Les tests de refus laissent volontairement un $LASTEXITCODE non nul (git hors depot) :
+# sans exit explicite, le runner GitHub le reprendrait comme code de sortie du script.
+# Un echec leve une exception avant d'arriver ici.
+exit 0
